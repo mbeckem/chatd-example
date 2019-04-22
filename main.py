@@ -66,7 +66,7 @@ class Application:
     
     # Receives a websocket connection
     async def handle_session(self, request):
-        ws = web.WebSocketResponse()
+        ws = web.WebSocketResponse(heartbeat = 60.0)
         await ws.prepare(request)
         
         name = f"User#{self._session_count}"
