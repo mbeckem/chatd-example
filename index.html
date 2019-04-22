@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Hello World</title>
+        <link rel="stylesheet" href="/assets/style.css">
+    </head>
+    <body>
+        <div id="app" v-cloak>
+            <div class="container">
+                <!--
+                    The message log's content is created dynamically when chat messages arive.
+                    We create dynamic dom nodes and insert them at the end. If the log gets too full,
+                    the oldest messages (child nodes) are removed.
+                -->
+                <div ref="message_log" class="message-log">
+                
+                </div>
+                
+                <div class="input-bar">
+                    <input
+                        ref="input_bar"
+                        type="text" class="message-input"
+                        v-model="currentMessage"
+                        v-on:keydown.enter.prevent="submitMessage()">
+                    <input
+                        type="button" class="message-send" value="Send"
+                        v-on:click.prevent="submitMessage()">
+                </div>
+            </div>
+        </div>
+        
+        <!-- TODO this is the dev version -->
+        <script type="text/javascript" src="/assets/vue.js"></script> 
+        <script type="text/javascript" src="/assets/app.js"></script>
+    </body>
+</html>
