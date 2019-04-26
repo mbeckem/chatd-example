@@ -122,6 +122,7 @@ class ChatSession:
     async def run(self, room):        
         self._write_task = asyncio.create_task(self.write())
         self._write_task.add_done_callback(ignore_result)
+        self._read_task = asyncio.current_task()
                 
         # Read incoming messages until an error occurs or we get cancelled.
         try:
@@ -140,12 +141,15 @@ class ChatSession:
                     break
                 
         except asyncio.CancelledError:
+            # logger.info(f"Reader cancelled: {self.name()}")
             raise
         except Exception:
             logger.exception("Error within a session.")
         finally:
             room.unregister(self)
-            self._write_task.cancel()
+            if not self._write_task.done() and not self._write_task.cancelled():
+                self._write_task.cancel()
+            # logger.info(f"Reader stopped: {self.name()}")
 
 
     # Sends a message to the client. Client's that are too slow to drain
@@ -175,15 +179,19 @@ class ChatSession:
                 
                 await self._socket.send_str(message)
         except asyncio.CancelledError:
+            # logger.info(f"Writer cancelled: {self.name()}")
             raise
         except Exception:
             logger.exception("Error writing to web socket.")
             self.stop()
+        finally:
+            # logger.info(f"Writer stopped: {self.name()}")
+            pass
 
 
     # Cancel both tasks
     def stop(self):
-        if not self._read_task.cancelled():
+        if not self._read_task.done() and not self._read_task.cancelled():
             self._read_task.cancel()
 
 
